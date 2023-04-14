@@ -199,7 +199,7 @@ export function proxyPathBuilder(
   if (!urlSearchParams) {
     return '';
   }
-  //console.log("item URI : ", itemUri);
+
   const allQueries = new URLSearchParams(urlSearchParams);
   let sourceItemURL = '';
   // Do not build an absolute source url If ItemUri is already an absolut url.
@@ -209,15 +209,14 @@ export function proxyPathBuilder(
     const sourceURL = allQueries.get('url');
     const baseURL: string = path.dirname(sourceURL);
     const [_baseURL, _itemUri] = cleanUpPathAndURI(baseURL, itemUri);
-    //console.log("base URL : ", baseURL);
-    
+
     sourceItemURL = `${_baseURL}/${_itemUri}`;
   }
   if (sourceItemURL) {
     allQueries.set('url', sourceItemURL);
   }
   const allQueriesString = allQueries.toString();
-  //console.log('all queries : ', allQueries);
+
   return `${proxy}${allQueriesString ? `?${allQueriesString}` : ''}`;
 }
 

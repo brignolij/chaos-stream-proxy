@@ -71,10 +71,8 @@ export function composeALBEvent(
   incomingHeaders: IncomingHttpHeaders
 ): ALBEvent {
   // Create ALBEvent from Fastify Request...
-  const [path, queryString] = url.split('?');
-  const queryStringParameters = Object.fromEntries(
-    new URLSearchParams(queryString)
-  );
+  const [path, ...queryString] = url.split("?");
+  const queryStringParameters = Object.fromEntries(new URLSearchParams(decodeURI(queryString.join('?').replace(/amp;/g, ''))));
   const requestContext = { elb: { targetGroupArn: '' } };
   const headers: Record<string, string> = {};
   // IncomingHttpHeaders type is Record<string, string|string[]> because set-cookie is an array
@@ -201,6 +199,7 @@ export function proxyPathBuilder(
   if (!urlSearchParams) {
     return '';
   }
+  //console.log("item URI : ", itemUri);
   const allQueries = new URLSearchParams(urlSearchParams);
   let sourceItemURL = '';
   // Do not build an absolute source url If ItemUri is already an absolut url.
@@ -210,12 +209,15 @@ export function proxyPathBuilder(
     const sourceURL = allQueries.get('url');
     const baseURL: string = path.dirname(sourceURL);
     const [_baseURL, _itemUri] = cleanUpPathAndURI(baseURL, itemUri);
+    //console.log("base URL : ", baseURL);
+    
     sourceItemURL = `${_baseURL}/${_itemUri}`;
   }
   if (sourceItemURL) {
     allQueries.set('url', sourceItemURL);
   }
   const allQueriesString = allQueries.toString();
+  //console.log('all queries : ', allQueries);
   return `${proxy}${allQueriesString ? `?${allQueriesString}` : ''}`;
 }
 

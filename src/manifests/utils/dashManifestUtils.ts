@@ -63,11 +63,11 @@ export default function (): DASHManifestTools {
         DASH_JSON = result;
       });
 
-      DASH_JSON.MPD.Period.map((period, index1) => {
-        period.AdaptationSet.map((adaptationSet, index2) => {
+      DASH_JSON.MPD.Period.map((period) => {
+        period.AdaptationSet.map((adaptationSet) => {
           if (adaptationSet.SegmentTemplate)
             forgeSegment(adaptationSet.SegmentTemplate, originalUrlQuery)
-          adaptationSet.Representation.map((representation, index3) => {
+          adaptationSet.Representation.map((representation) => {
             if (representation.SegmentTemplate)
               forgeSegment(representation.SegmentTemplate, originalUrlQuery, representation)
           });
@@ -84,7 +84,7 @@ export default function (): DASHManifestTools {
 
 function forgeSegment(segment, originalUrlQuery, representation?) {
   if (segment) {
-    segment.map((segmentTemplate, index4) => {
+    segment.map((segmentTemplate) => {
     // Media attr.
     const mediaUrl = segmentTemplate.$.media;
 

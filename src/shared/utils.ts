@@ -75,12 +75,14 @@ export async function composeALBEvent(
 ): Promise<ALBEvent> {
   // Create ALBEvent from Fastify Request...
 
-  if ((AppSettings.loadUrlParametersFromAwsSSM)) {
+  if (AppSettings.loadUrlParametersFromAwsSSM) {
     url = await addSSMUrlParametersToUrl(url);
   }
 
   const [path, ...queryString] = url.split('?');
-  const queryStringParameters = Object.fromEntries(new URLSearchParams(decodeURIComponent(queryString.join('?'))));
+  const queryStringParameters = Object.fromEntries(
+    new URLSearchParams(decodeURIComponent(queryString.join('?')))
+  );
 
   const requestContext = { elb: { targetGroupArn: '' } };
   const headers: Record<string, string> = {};
@@ -119,19 +121,10 @@ export async function parseM3U8Text(res: Response): Promise<M3U> {
    We set PLAYLIST-TYPE here if that is the case to ensure,
    that 'm3u.toString()' will later return a m3u8 string with the endlist tag.
   */
-  let setPlaylistTypeToVod = false;
   const parser = m3u8.createStream();
-  const responseCopy = res.clone();
-  const m3u8String = await responseCopy.text();
-  if (m3u8String.indexOf('#EXT-X-ENDLIST') !== -1) {
-    setPlaylistTypeToVod = true;
-  }
   res.body.pipe(parser);
   return new Promise((resolve, reject) => {
     parser.on('m3u', (m3u: M3U) => {
-      if (setPlaylistTypeToVod && m3u.get('playlistType') !== 'VOD') {
-        m3u.set('playlistType', 'VOD');
-      }
       resolve(m3u);
     });
     parser.on('error', (err) => {
@@ -220,7 +213,7 @@ export function proxyPathBuilder(
     const baseURL: string = path.dirname(sourceURL);
     const [_baseURL, _itemUri] = cleanUpPathAndURI(baseURL, itemUri);
     //console.log("base URL : ", baseURL);
-    
+
     sourceItemURL = `${_baseURL}/${_itemUri}`;
   }
   if (sourceItemURL) {
@@ -252,6 +245,7 @@ export function segmentUrlParamString(
 export const SERVICE_ORIGIN =
   process.env.SERVICE_ORIGIN || 'http://localhost:8000';
 
-export class AppSettings  {
-  static loadUrlParametersFromAwsSSM: Boolean = process.env.LOAD_PARAMS_FROM_AWS_SSM === 'true';
+export class AppSettings {
+  static loadUrlParametersFromAwsSSM: boolean =
+    process.env.LOAD_PARAMS_FROM_AWS_SSM === 'true';
 }

@@ -37,7 +37,9 @@ describe('dashManifestTools', () => {
       parser.parseString(dashFile, function (err, result) {
         DASH_JSON = result;
       });
-      const expected: string = builder.buildObject(DASH_JSON);
+      const expected: string = decodeURIComponent(
+        builder.buildObject(DASH_JSON)
+      );
       expect(proxyManifest).toEqual(expected);
     });
   });
